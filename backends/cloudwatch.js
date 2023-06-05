@@ -64,6 +64,10 @@ ConsoleBackend.prototype.flush = function(timestamp, metrics) {
   const isoTimeStamp = new Date(timestamp * 1000).toISOString()
   const logLine = `[StatsD] ${isoTimeStamp} - ${JSON.stringify(out)}`
   console.log(logLine);
+  const used = process.memoryUsage()
+  for (let key in used) {
+    console.log(`[Analysis] Memory: ${key} ${Math.round(used[key] / 1024 / 1024)} MB`);
+  }
 };
 
 ConsoleBackend.prototype.status = function(write) {
