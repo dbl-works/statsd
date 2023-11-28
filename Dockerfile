@@ -1,8 +1,11 @@
 # https://github.com/statsd/statsd/blob/master/Dockerfile
-FROM node:20-alpine3.17
+FROM node:20-alpine3.18
 
-RUN apk update && apk add --no-cache git
-RUN git clone --branch v0.10.1 https://github.com/statsd/statsd.git /usr/src/app
+# Update core packages
+RUN apk update && apk upgrade
+
+RUN apk add --no-cache git
+RUN git clone --branch v0.10.2 https://github.com/statsd/statsd.git /usr/src/app
 
 WORKDIR /usr/src/app
 
