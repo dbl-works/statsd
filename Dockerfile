@@ -1,5 +1,5 @@
 # https://github.com/statsd/statsd/blob/master/Dockerfile
-FROM node:20-alpine3.18
+FROM node:20-alpine3.19
 
 # Update core packages
 RUN apk update && apk upgrade
