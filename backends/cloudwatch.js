@@ -1,6 +1,17 @@
 // Refer to here if we want to send to cloudwatch directly
 // and have more customisation on cloudwatch logs => https://github.com/camitz/aws-cloudwatch-statsd-backend/blob/master/lib/aws-cloudwatch-statsd-backend.js#L81
 
+// statsD will output explictily 0 for each counter where no values where tracked.
+// We don't want all the 0-values in our datawarehouse.
+function removeZeroValues(obj) {
+  return Object.entries(obj).reduce((acc, [key, value]) => {
+    if (value !== 0) {
+      acc[key] = value;
+    }
+    return acc;
+  }, {});
+}
+
 function ConsoleBackend(startupTime, config, emitter){
   var self = this;
   this.lastFlush = startupTime;
@@ -37,20 +48,12 @@ ConsoleBackend.prototype.flush = function(timestamp, metrics) {
   //   ]
   // }
 
-  // Only output the metric with value > 0 so that the collector doesn't need to handle huge object
-  const counters = Object.entries(metrics.counters).reduce((acc, [key, value]) => {
-    if (value !== 0) {
-      acc[key] = value;
-    }
-    return acc;
-  }, {});
-
   var out = {
-    counters,
-    // timers: metrics.timers,
-    // gauges: metrics.gauges,
-    // timer_data: metrics.timer_data,
-    // counter_rates: metrics.counter_rates,
+    counters: removeZeroValues(metrics.counters),
+    timers: removeZeroValues(metrics.timers),
+    gauges: removeZeroValues(metrics.gauges),
+    timer_data: removeZeroValues(metrics.timer_data),
+    counter_rates: removeZeroValues(metrics.counter_rates),
     // sets: function (vals) {
     //   var ret = {};
     //   for (var val in vals) {
