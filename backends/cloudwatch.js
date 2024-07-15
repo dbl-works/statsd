@@ -1,11 +1,11 @@
 // Refer to here if we want to send to cloudwatch directly
 // and have more customisation on cloudwatch logs => https://github.com/camitz/aws-cloudwatch-statsd-backend/blob/master/lib/aws-cloudwatch-statsd-backend.js#L81
 
-// statsD will output explictily 0 / [] for each counter/timer where no values where tracked.
-// We don't want all the blank values in our datawarehouse.
+// statsD will output explicitly 0 / [] for each counter/timer where no values were tracked.
+// We don't want all the blank values in our data warehouse.
 function removeBlankValues(obj) {
   return Object.entries(obj).reduce((acc, [key, value]) => {
-    if (value !== 0 || value !== undefined || Object.keys(value).length > 0) {
+    if (value !== 0 && value !== undefined && (!Array.isArray(value) || value.length > 0) && (typeof value !== 'object' || Object.keys(value).length > 0)) {
       acc[key] = value;
     }
     return acc;
@@ -77,21 +77,21 @@ ConsoleBackend.prototype.flush = function (timestamp, metrics) {
   // }
 
   // transform this into the same shape as "counters", i.e. { "key;tag1=val1;tag2=val2": value }
-  const timers = removeBlankValues(metrics.timer_data).map((key, values) => {
+  const timers = Object.entries(removeBlankValues(metrics.timer_data)).map(([key, values]) => {
     const tags = [
       `min=${values['lower']}`,
       `median=${values['median']}`,
       `p90=${values['mean_90']}`,
       `max=${values['upper']}`,
-      `count=${values['count']}`,
-    ].join(';')
-    const keyWithTags = `${key};${tags}`
-    return [keyWithTags, values['mean_90']]
-  })
+      `count=${values['count']}`
+    ].join(';');
+    const keyWithTags = `${key};${tags}`;
+    return [keyWithTags, values['mean_90']];
+  });
 
   var out = {
     counters: removeBlankValues(metrics.counters),
-    timers: timers,
+    timers: Object.fromEntries(timers),
     gauges: removeBlankValues(metrics.gauges),
     // counter_rates: removeBlankValues(metrics.counter_rates), // this is just statsd's internal meta data (e.g. "statsd.packets_received")
   };
@@ -102,7 +102,7 @@ ConsoleBackend.prototype.flush = function (timestamp, metrics) {
   const used = process.memoryUsage();
   for (let key in used) {
     console.log(
-      `[Analysis] Memory: ${key} ${Math.round(used[key] / 1024 / 1024)} MB`
+      `[Analysis] Memory: ${key} ${(used[key] / 1024 / 1024).toFixed(2)} MB`
     );
   }
 };
