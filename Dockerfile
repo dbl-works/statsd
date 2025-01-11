@@ -1,5 +1,5 @@
 # https://github.com/statsd/statsd/blob/master/Dockerfile
-FROM node:20-alpine3.20
+FROM node:20-alpine3.21
 
 # Update core packages
 RUN apk update && apk upgrade
@@ -11,7 +11,7 @@ WORKDIR /usr/src/app
 
 # Setup node envs
 ARG NODE_ENV
-ENV NODE_ENV $NODE_ENV
+ENV NODE_ENV=$NODE_ENV
 
 # Install dependencies
 # COPY package.json /usr/src/app/
