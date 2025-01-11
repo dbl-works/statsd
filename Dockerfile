@@ -11,7 +11,7 @@ WORKDIR /usr/src/app
 
 # Setup node envs
 ARG NODE_ENV
-ENV NODE_ENV $NODE_ENV
+ENV NODE_ENV=$NODE_ENV
 
 # Install dependencies
 # COPY package.json /usr/src/app/
