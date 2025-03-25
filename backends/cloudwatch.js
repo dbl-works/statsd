@@ -77,6 +77,7 @@ ConsoleBackend.prototype.status = function(write) {
 };
 
 exports.init = function(startupTime, config, events) {
+  config['flushInterval'] ||= process.env.STATSD_FLUSH_INTERVAL_IN_MS
   var instance = new ConsoleBackend(startupTime, config, events);
   return true;
 };
