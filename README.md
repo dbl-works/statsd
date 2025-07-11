@@ -2,6 +2,12 @@
 
 [Dockerhub](https://hub.docker.com/r/dblworks/statsd)
 
+## Configuration
+
+You can configure the statsd server by setting the following environment variables:
+
+- `STATSD_FLUSH_INTERVAL_IN_MS`: The interval in milliseconds to flush metrics to each backend. Default is 900000ms (15 minutes).
+
 ## Building
 
 On a x86 chip

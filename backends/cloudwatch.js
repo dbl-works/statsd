@@ -113,7 +113,10 @@ ConsoleBackend.prototype.status = function (write) {
   }, this);
 };
 
-exports.init = function (startupTime, config, events) {
+exports.init = function(startupTime, config, events) {
+  console.log("[StatsD] Initializing Console Backend");
+  console.log("[StatsD] flushInterval set to ", config['flushInterval'], "ms");
+
   var instance = new ConsoleBackend(startupTime, config, events);
   return true;
 };
